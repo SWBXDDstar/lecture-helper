@@ -153,10 +153,13 @@
                                   StrokeThickness="1.9" StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
                         </Grid>
                     </ToggleButton>
-                    <ToggleButton x:Name="BtnCircle" Style="{StaticResource ToolToggle}" ToolTip="동그라미 도장 (O) · 속이 비어 글씨가 보인다">
-                        <Ellipse Width="15" Height="15"
-                                 Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ToggleButton}}"
-                                 StrokeThickness="2.4"/>
+                    <ToggleButton x:Name="BtnCircle" Style="{StaticResource ToolToggle}" ToolTip="동그라미 도장 (O)">
+                        <Grid Width="18" Height="18">
+                            <Ellipse Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ToggleButton}}" StrokeThickness="1.7"/>
+                            <Ellipse Width="8" Height="8"
+                                     Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ToggleButton}}"
+                                     StrokeThickness="2"/>
+                        </Grid>
                     </ToggleButton>
                     <ToggleButton x:Name="BtnText" Style="{StaticResource ToolToggle}" ToolTip="텍스트 (T)">
                         <Path Style="{StaticResource ToolIconPath}" Data="M5,6.5 V4.5 H19 V6.5 M12,4.5 V19.5 M9,19.5 H15"/>

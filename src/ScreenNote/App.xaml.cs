@@ -197,7 +197,7 @@ public partial class App : Application
               S                 별         "이거 중요"
               V                 체크       "이건 맞음"
               X                 엑스       "이건 틀림"
-              O                 동그라미   채점용. 속이 비어 있어 안쪽 글씨가 보인다
+              O                 동그라미   "이건 정답"
 
             [그 밖에]
               E                 전체 지우기

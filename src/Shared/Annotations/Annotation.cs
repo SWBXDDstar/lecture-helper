@@ -208,8 +208,7 @@ public sealed class StampAnnotation : Annotation
             case StampKind.Star: RenderStar(dc, fill, rim); break;
             case StampKind.Check: RenderCheck(dc, fill, rim); break;
             case StampKind.Cross: RenderCross(dc, fill, rim); break;
-            // 채점의 ○는 속이 빈 고리로 그린다 — 가린 자리 아래 글씨가 그대로 보여야 한다.
-            case StampKind.Circle: RenderCircle(dc); break;
+            case StampKind.Circle: RenderCircle(dc, fill, rim); break;
             default: RenderGlyph(dc, fill, rim, "?"); break;
         }
     }
@@ -254,21 +253,14 @@ public sealed class StampAnnotation : Annotation
         dc.DrawLine(stroke, new Point(Center.X + d, Center.Y - d), new Point(Center.X - d, Center.Y + d));
     }
 
-    /// <summary>
-    /// 채점용 ○. 다른 도장과 달리 속을 채우지 않는다 — 정답에 동그라미를 치면
-    /// 그 안의 글씨가 보여야 하기 때문이다. 흰 테두리를 바깥에 덧대 어두운 배경에서도 보이게 한다.
-    /// </summary>
-    private void RenderCircle(DrawingContext dc)
+    /// <summary>채점용 ○. 체크·엑스와 같은 원 안에 흰 고리를 넣어 한 가족으로 보이게 한다.</summary>
+    private void RenderCircle(DrawingContext dc, Brush fill, Pen rim)
     {
-        double width = Radius * 0.34;
+        dc.DrawEllipse(fill, rim, Center, Radius, Radius);
 
-        var halo = new Pen(Brushes.White, width * 1.7);
-        halo.Freeze();
-        dc.DrawEllipse(null, halo, Center, Radius * 0.82, Radius * 0.82);
-
-        var ring = new Pen(new SolidColorBrush(Color), width);
+        var ring = new Pen(Brushes.White, Radius * 0.26);
         ring.Freeze();
-        dc.DrawEllipse(null, ring, Center, Radius * 0.82, Radius * 0.82);
+        dc.DrawEllipse(null, ring, Center, Radius * 0.44, Radius * 0.44);
     }
 
     private void RenderGlyph(DrawingContext dc, Brush fill, Pen rim, string glyph)

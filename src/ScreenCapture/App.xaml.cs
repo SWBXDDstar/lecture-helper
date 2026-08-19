@@ -226,7 +226,7 @@ public partial class App : Application
               S                 별
               V                 체크
               X                 엑스
-              O                 동그라미 (속이 비어 안쪽 글씨가 보인다)
+              O                 동그라미
 
             [마무리]
               Ctrl+C 또는 Enter 복사하고 닫기
