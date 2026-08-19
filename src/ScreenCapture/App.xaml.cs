@@ -210,7 +210,7 @@ public partial class App : Application
               Shift+드래그      직선
               Ctrl+Shift+드래그 화살표
               마우스 휠         선 두께
-              R G B O Y P       색상 (빨강 초록 파랑 주황 노랑 분홍)
+              R G B Y P         색상 (빨강 초록 파랑 노랑 분홍)
               T                 텍스트
               E                 전체 지우기
               Ctrl+Z / Ctrl+Y   실행 취소 / 다시 실행
@@ -225,6 +225,8 @@ public partial class App : Application
               Q                 물음표
               S                 별
               V                 체크
+              X                 엑스
+              O                 동그라미 (속이 비어 안쪽 글씨가 보인다)
 
             [마무리]
               Ctrl+C 또는 Enter 복사하고 닫기

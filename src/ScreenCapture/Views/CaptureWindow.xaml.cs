@@ -192,6 +192,8 @@ public partial class CaptureWindow : Window
         BtnQuestion.Click += (_, _) => SetTool(ToolKind.Question);
         BtnStar.Click += (_, _) => SetTool(ToolKind.Star);
         BtnCheck.Click += (_, _) => SetTool(ToolKind.Check);
+        BtnCross.Click += (_, _) => SetTool(ToolKind.Cross);
+        BtnCircle.Click += (_, _) => SetTool(ToolKind.Circle);
         BtnText.Click += (_, _) => SetTool(ToolKind.Text);
 
         BtnColor.Click += (_, _) =>
@@ -232,6 +234,8 @@ public partial class CaptureWindow : Window
         BtnQuestion.IsChecked = _tool == ToolKind.Question;
         BtnStar.IsChecked = _tool == ToolKind.Star;
         BtnCheck.IsChecked = _tool == ToolKind.Check;
+        BtnCross.IsChecked = _tool == ToolKind.Cross;
+        BtnCircle.IsChecked = _tool == ToolKind.Circle;
         BtnText.IsChecked = _tool == ToolKind.Text;
 
         ColorPalette.Visibility = Visibility.Collapsed;

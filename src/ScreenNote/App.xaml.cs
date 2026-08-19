@@ -181,7 +181,7 @@ public partial class App : Application
               Shift+드래그      직선
               Ctrl+Shift+드래그 화살표
               마우스 휠         선 두께
-              R G B O Y P       색상 (빨강 초록 파랑 주황 노랑 분홍)
+              R G B Y P         색상 (빨강 초록 파랑 노랑 분홍)
 
             [도구 — 같은 키를 다시 누르면 펜으로 돌아옴]
               H                 형광펜    수식키가 그대로 먹습니다.
@@ -196,6 +196,8 @@ public partial class App : Application
               Q                 물음표     "여기 왜?"
               S                 별         "이거 중요"
               V                 체크       "이건 맞음"
+              X                 엑스       "이건 틀림"
+              O                 동그라미   채점용. 속이 비어 있어 안쪽 글씨가 보인다
 
             [그 밖에]
               E                 전체 지우기

@@ -70,14 +70,14 @@
                     <Run Text="Ctrl+Shift" FontWeight="Bold"/><Run Text=" 화살표   "/>
                     <Run Text="휠" FontWeight="Bold"/><Run Text=" 두께"/>
                     <LineBreak/>
-                    <Run Text="R G B O Y P" FontWeight="Bold"/><Run Text=" 색상   "/>
+                    <Run Text="R G B Y P" FontWeight="Bold"/><Run Text=" 색상   "/>
                     <Run Text="H" FontWeight="Bold"/><Run Text=" 형광펜   "/>
                     <Run Text="M" FontWeight="Bold"/><Run Text=" 모자이크   "/>
                     <Run Text="N" FontWeight="Bold"/><Run Text=" 숫자   "/>
                     <Run Text="T" FontWeight="Bold"/><Run Text=" 텍스트   "/>
                     <Run Text="Q" FontWeight="Bold"/><Run Text=" 물음표   "/>
                     <Run Text="S" FontWeight="Bold"/><Run Text=" 별   "/>
-                    <Run Text="V" FontWeight="Bold"/><Run Text=" 체크   "/>
+                    <Run Text="V" FontWeight="Bold"/><Run Text=" 체크   "/><Run Text="X" FontWeight="Bold"/><Run Text=" 엑스   "/><Run Text="O" FontWeight="Bold"/><Run Text=" 동그라미   "/>
                     <Run Text="F1" FontWeight="Bold"/><Run Text=" 이 안내   "/>
                     <Run Text="Esc" FontWeight="Bold"/><Run Text=" 취소"/>
                 </TextBlock>
@@ -144,6 +144,19 @@
                                   Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ToggleButton}}"
                                   StrokeThickness="1.9" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round"/>
                         </Grid>
+                    </ToggleButton>
+                    <ToggleButton x:Name="BtnCross" Style="{StaticResource ToolToggle}" ToolTip="X 도장 (X)">
+                        <Grid Width="18" Height="18">
+                            <Ellipse Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ToggleButton}}" StrokeThickness="1.7"/>
+                            <Path Data="M6.2,6.2 L11.8,11.8 M11.8,6.2 L6.2,11.8" Stretch="None"
+                                  Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ToggleButton}}"
+                                  StrokeThickness="1.9" StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+                        </Grid>
+                    </ToggleButton>
+                    <ToggleButton x:Name="BtnCircle" Style="{StaticResource ToolToggle}" ToolTip="동그라미 도장 (O) · 속이 비어 글씨가 보인다">
+                        <Ellipse Width="15" Height="15"
+                                 Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ToggleButton}}"
+                                 StrokeThickness="2.4"/>
                     </ToggleButton>
                     <ToggleButton x:Name="BtnText" Style="{StaticResource ToolToggle}" ToolTip="텍스트 (T)">
                         <Path Style="{StaticResource ToolIconPath}" Data="M5,6.5 V4.5 H19 V6.5 M12,4.5 V19.5 M9,19.5 H15"/>

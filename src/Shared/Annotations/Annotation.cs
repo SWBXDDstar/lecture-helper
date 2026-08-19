@@ -10,7 +10,7 @@ namespace LectureHelper.Annotations;
 public enum ToolKind
 {
     None, Pen, Highlighter, Line, Arrow, Rectangle, Ellipse, Mosaic, Blur, Number, Text,
-    Question, Star, Check
+    Question, Star, Check, Cross, Circle
 }
 
 public sealed class RenderContext
@@ -184,7 +184,7 @@ public sealed class NumberAnnotation : Annotation
     }
 }
 
-public enum StampKind { Question, Star, Check }
+public enum StampKind { Question, Star, Check, Cross, Circle }
 
 /// <summary>
 /// A one-click mark. Drawn opaque with a white rim so it stays legible over slides, photos and
@@ -207,6 +207,9 @@ public sealed class StampAnnotation : Annotation
         {
             case StampKind.Star: RenderStar(dc, fill, rim); break;
             case StampKind.Check: RenderCheck(dc, fill, rim); break;
+            case StampKind.Cross: RenderCross(dc, fill, rim); break;
+            // 채점의 ○는 속이 빈 고리로 그린다 — 가린 자리 아래 글씨가 그대로 보여야 한다.
+            case StampKind.Circle: RenderCircle(dc); break;
             default: RenderGlyph(dc, fill, rim, "?"); break;
         }
     }
@@ -232,6 +235,40 @@ public sealed class StampAnnotation : Annotation
         }
         geometry.Freeze();
         dc.DrawGeometry(fill, rim, geometry);
+    }
+
+    /// <summary>X 표시. 체크와 짝이라 같은 원 안에 흰 획으로 그린다.</summary>
+    private void RenderCross(DrawingContext dc, Brush fill, Pen rim)
+    {
+        dc.DrawEllipse(fill, rim, Center, Radius, Radius);
+
+        var stroke = new Pen(Brushes.White, Radius * 0.30)
+        {
+            StartLineCap = PenLineCap.Round,
+            EndLineCap = PenLineCap.Round,
+        };
+        stroke.Freeze();
+
+        double d = Radius * 0.40;
+        dc.DrawLine(stroke, new Point(Center.X - d, Center.Y - d), new Point(Center.X + d, Center.Y + d));
+        dc.DrawLine(stroke, new Point(Center.X + d, Center.Y - d), new Point(Center.X - d, Center.Y + d));
+    }
+
+    /// <summary>
+    /// 채점용 ○. 다른 도장과 달리 속을 채우지 않는다 — 정답에 동그라미를 치면
+    /// 그 안의 글씨가 보여야 하기 때문이다. 흰 테두리를 바깥에 덧대 어두운 배경에서도 보이게 한다.
+    /// </summary>
+    private void RenderCircle(DrawingContext dc)
+    {
+        double width = Radius * 0.34;
+
+        var halo = new Pen(Brushes.White, width * 1.7);
+        halo.Freeze();
+        dc.DrawEllipse(null, halo, Center, Radius * 0.82, Radius * 0.82);
+
+        var ring = new Pen(new SolidColorBrush(Color), width);
+        ring.Freeze();
+        dc.DrawEllipse(null, ring, Center, Radius * 0.82, Radius * 0.82);
     }
 
     private void RenderGlyph(DrawingContext dc, Brush fill, Pen rim, string glyph)

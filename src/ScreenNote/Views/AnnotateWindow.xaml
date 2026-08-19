@@ -49,7 +49,7 @@
                     <Run Text="Ctrl+Shift" FontWeight="Bold"/><Run Text=" 화살표"/>
                     <LineBreak/>
                     <Run Text="휠" FontWeight="Bold"/><Run Text=" 두께   "/>
-                    <Run Text="R G B O Y P" FontWeight="Bold"/><Run Text=" 색상   "/>
+                    <Run Text="R G B Y P" FontWeight="Bold"/><Run Text=" 색상   "/>
                     <Run Text="H" FontWeight="Bold"/><Run Text=" 형광펜   "/>
                     <Run Text="M" FontWeight="Bold"/><Run Text=" 모자이크   "/>
                     <Run Text="Shift+M" FontWeight="Bold"/><Run Text=" 흐리게   "/>
@@ -57,7 +57,7 @@
                     <Run Text="T" FontWeight="Bold"/><Run Text=" 텍스트   "/>
                     <Run Text="Q" FontWeight="Bold"/><Run Text=" 물음표   "/>
                     <Run Text="S" FontWeight="Bold"/><Run Text=" 별   "/>
-                    <Run Text="V" FontWeight="Bold"/><Run Text=" 체크"/>
+                    <Run Text="V" FontWeight="Bold"/><Run Text=" 체크   "/><Run Text="X" FontWeight="Bold"/><Run Text=" 엑스   "/><Run Text="O" FontWeight="Bold"/><Run Text=" 동그라미"/>
                     <LineBreak/>
                     <Run Text="E" FontWeight="Bold"/><Run Text=" 전체 지우기   "/>
                     <Run Text="Ctrl+Z" FontWeight="Bold"/><Run Text=" 되돌리기   "/>
