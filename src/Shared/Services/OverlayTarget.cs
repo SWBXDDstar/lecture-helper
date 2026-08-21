@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using LectureHelper.Native;
 using Forms = System.Windows.Forms;
 
@@ -44,12 +45,22 @@ public static class OverlayTarget
         return Forms::Screen.FromPoint(new System.Drawing.Point(p.X, p.Y));
     }
 
+    /// <summary>
+    /// 윈도우 디스플레이 설정에 뜨는 번호. 장치 이름 `\\.\DISPLAY3` 의 숫자가 그 번호다.
+    /// 열거 순서로 매기면 설정 화면의 번호와 어긋나서 어느 모니터인지 못 찾는다.
+    /// </summary>
+    public static int DisplayNumber(Forms::Screen screen)
+    {
+        var m = Regex.Match(screen.DeviceName ?? "", @"DISPLAY(\d+)");
+        return m.Success ? int.Parse(m.Groups[1].Value)
+                         : Array.IndexOf(Forms::Screen.AllScreens, screen) + 1;
+    }
+
     /// <summary>트레이 메뉴에 보여줄 이름. "1번 모니터 (1920×1080, 주 모니터)" 꼴.</summary>
     public static string Describe(Forms::Screen screen)
     {
-        int index = Array.IndexOf(Forms::Screen.AllScreens, screen) + 1;
         string primary = screen.Primary ? ", 주 모니터" : "";
-        return $"{index}번 모니터 ({screen.Bounds.Width}×{screen.Bounds.Height}{primary})";
+        return $"{DisplayNumber(screen)}번 모니터 ({screen.Bounds.Width}×{screen.Bounds.Height}{primary})";
     }
 
     /// <summary>설정값 하나를 사람이 읽는 한 줄로. 트레이 메뉴 제목에 쓴다.</summary>

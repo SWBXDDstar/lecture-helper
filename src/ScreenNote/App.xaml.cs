@@ -5,6 +5,7 @@ using System.Threading;
 using System.Windows;
 using LectureHelper.Native;
 using LectureHelper.Services;
+using LectureHelper.Views;
 using ScreenNote.Views;
 using Forms = System.Windows.Forms;
 
@@ -103,7 +104,7 @@ public partial class App : Application
             root.DropDownItems.Clear();
             string current = AppSettings.OverlayMonitor;
 
-            void Add(string text, string value)
+            Forms::ToolStripMenuItem Add(string text, string value)
             {
                 var item = new Forms::ToolStripMenuItem(text) { Checked = value == current };
                 item.Click += (_, _) =>
@@ -112,18 +113,28 @@ public partial class App : Application
                     root.Text = MonitorLabel();
                 };
                 root.DropDownItems.Add(item);
+                return item;
             }
 
             Add("마우스가 있는 모니터", OverlayTarget.FollowCursor);
             root.DropDownItems.Add(new Forms::ToolStripSeparator());
 
             foreach (var screen in OverlayTarget.Monitors)
-                Add(OverlayTarget.Describe(screen), screen.DeviceName);
+            {
+                var item = Add(OverlayTarget.Describe(screen), screen.DeviceName);
+
+                // 모니터가 넷이면 해상도가 다 같아 글자만으로는 못 고른다.
+                // 마우스를 올리면 그 화면에 번호를 띄워 어디인지 바로 보여준다.
+                var target = screen;
+                item.MouseEnter += (_, _) => MonitorBadge.ShowOn(target);
+                item.MouseLeave += (_, _) => MonitorBadge.HideBadge();
+            }
 
             root.DropDownItems.Add(new Forms::ToolStripSeparator());
             Add("모든 모니터 (예전 방식)", OverlayTarget.AllMonitors);
         };
 
+        root.DropDownClosed += (_, _) => MonitorBadge.HideBadge();
         return root;
     }
 
@@ -286,6 +297,7 @@ public partial class App : Application
 
     protected override void OnExit(ExitEventArgs e)
     {
+        MonitorBadge.Dispose();
         _hotkeys?.Dispose();
         if (_tray is not null)
         {
