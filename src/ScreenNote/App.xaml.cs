@@ -72,6 +72,7 @@ public partial class App : Application
         menu.Items.Add("화면 주석  (Ctrl+2)", null, (_, _) => StartAnnotate());
         menu.Items.Add("수업 타이머  (Ctrl+3)", null, (_, _) => ToggleTimer());
         menu.Items.Add(new Forms::ToolStripSeparator());
+        menu.Items.Add(BuildMonitorItem());
         menu.Items.Add(LectureHelper.Views.StartupMenuItem.Create(StartupName));
         menu.Items.Add("단축키 안내", null, (_, _) => ShowHelp());
         menu.Items.Add("종료", null, (_, _) => Shutdown());
@@ -88,6 +89,46 @@ public partial class App : Application
             if (args.Button == Forms::MouseButtons.Left) StartAnnotate();
         };
     }
+
+    /// <summary>
+    /// 확대·주석이 어느 모니터를 덮을지 고르는 메뉴.
+    /// 모니터는 연결이 바뀌므로 목록은 메뉴를 펼칠 때마다 새로 만든다.
+    /// </summary>
+    private static Forms::ToolStripMenuItem BuildMonitorItem()
+    {
+        var root = new Forms::ToolStripMenuItem { Text = MonitorLabel() };
+
+        root.DropDownOpening += (_, _) =>
+        {
+            root.DropDownItems.Clear();
+            string current = AppSettings.OverlayMonitor;
+
+            void Add(string text, string value)
+            {
+                var item = new Forms::ToolStripMenuItem(text) { Checked = value == current };
+                item.Click += (_, _) =>
+                {
+                    AppSettings.OverlayMonitor = value;
+                    root.Text = MonitorLabel();
+                };
+                root.DropDownItems.Add(item);
+            }
+
+            Add("마우스가 있는 모니터", OverlayTarget.FollowCursor);
+            root.DropDownItems.Add(new Forms::ToolStripSeparator());
+
+            foreach (var screen in OverlayTarget.Monitors)
+                Add(OverlayTarget.Describe(screen), screen.DeviceName);
+
+            root.DropDownItems.Add(new Forms::ToolStripSeparator());
+            Add("모든 모니터 (예전 방식)", OverlayTarget.AllMonitors);
+        };
+
+        return root;
+    }
+
+    private static string MonitorLabel() =>
+        $"오버레이 화면:  {OverlayTarget.DescribeSetting(AppSettings.OverlayMonitor)}";
 
     private void SetupHotkeys()
     {
@@ -162,8 +203,12 @@ public partial class App : Application
             """
             [전역 단축키]
               Ctrl+1   확대        화면을 정지시키고 커서를 따라 확대
-              Ctrl+2   화면 주석  화면 전체에 바로 그리기
+              Ctrl+2   화면 주석  화면에 바로 그리기
               Ctrl+3   수업 타이머
+
+            [듀얼 모니터]
+              확대·주석은 모니터 한 대만 덮습니다. 옆 화면의 채팅·자료는 그대로 보입니다.
+              기본은 마우스가 있는 모니터이고, 트레이 메뉴 "오버레이 화면"에서 고정할 수 있습니다.
 
             [확대 화면에서]
               마우스 이동       확대 지점 이동

@@ -13,7 +13,15 @@ public static class ScreenGrabber
     public static BitmapSource CaptureVirtualScreen(out NativeMethods.RECT bounds)
     {
         bounds = NativeMethods.GetVirtualScreen();
+        return Capture(bounds);
+    }
 
+    /// <summary>
+    /// Grabs one rectangle of the desktop. ScreenNote uses this to cover a single monitor —
+    /// freezing every screen would black out the teacher's second monitor mid-lesson.
+    /// </summary>
+    public static BitmapSource Capture(NativeMethods.RECT bounds)
+    {
         using var bitmap = new Bitmap(bounds.Width, bounds.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
         using (var g = Graphics.FromImage(bitmap))
         {

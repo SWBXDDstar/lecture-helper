@@ -44,7 +44,9 @@ public partial class ZoomWindow : Window
     {
         InitializeComponent();
 
-        _shot = ScreenGrabber.CaptureVirtualScreen(out _bounds);
+        // 설정된 모니터 한 대만 덮는다. 전체를 얼리면 옆 화면의 채팅·자료를 못 본다.
+        _bounds = OverlayTarget.Resolve(AppSettings.OverlayMonitor);
+        _shot = ScreenGrabber.Capture(_bounds);
         _context = new RenderContext { Effects = new EffectCache(_shot) };
         _session = new DrawingSession(Layer.Items);
 

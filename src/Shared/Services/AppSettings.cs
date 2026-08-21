@@ -13,6 +13,25 @@ public static class AppSettings
 {
     private const string Key = @"Software\LectureHelper";
     private const string SaveFolderValue = "SaveFolder";
+    private const string OverlayMonitorValue = "OverlayMonitor";
+
+    /// <summary>
+    /// ScreenNote 오버레이가 덮을 모니터의 장치 이름.
+    /// 빈 값이면 마우스가 있는 모니터, "*"면 전부. 자세한 것은 <see cref="OverlayTarget"/>.
+    /// </summary>
+    public static string OverlayMonitor
+    {
+        get
+        {
+            using var key = Registry.CurrentUser.OpenSubKey(Key);
+            return key?.GetValue(OverlayMonitorValue) as string ?? OverlayTarget.FollowCursor;
+        }
+        set
+        {
+            using var key = Registry.CurrentUser.CreateSubKey(Key);
+            key?.SetValue(OverlayMonitorValue, value);
+        }
+    }
 
     /// <summary>Where captures are written. Downloads by default — the folder people already empty.</summary>
     public static string SaveFolder
