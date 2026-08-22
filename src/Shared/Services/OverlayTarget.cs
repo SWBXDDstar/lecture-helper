@@ -74,7 +74,15 @@ public static class OverlayTarget
         return pinned is not null ? Describe(pinned) : "고정한 모니터 없음 → 마우스 따라감";
     }
 
-    public static IReadOnlyList<Forms::Screen> Monitors => Forms::Screen.AllScreens;
+    /// <summary>
+    /// 디스플레이 번호순으로 정렬한 목록.
+    ///
+    /// `Screen.AllScreens` 는 `EnumDisplayMonitors` 를 그대로 쓰는데 이 함수는 순서를 보장하지
+    /// 않는다 — GPU 드라이버가 읊는 대로다. 실제로 모니터 4대짜리 PC에서 1→4→2→3 으로 나왔고
+    /// 주 모니터가 세 번째였다. 메뉴에 그대로 뿌리면 눈에 거슬리므로 번호로 정렬한다.
+    /// </summary>
+    public static IReadOnlyList<Forms::Screen> Monitors =>
+        Forms::Screen.AllScreens.OrderBy(DisplayNumber).ToList();
 
     private static NativeMethods.RECT ToRect(System.Drawing.Rectangle r) => new()
     {
