@@ -71,7 +71,10 @@ public partial class CaptureWindow : Window
     {
         InitializeComponent();
 
-        _shot = ScreenGrabber.CaptureVirtualScreen(out _bounds);
+        // 설정된 화면만 잡는다. 모니터가 넷이면 전부 어두워지는 게 거슬리고,
+        // 5760×1880 을 매번 복사하는 것도 낭비다. "모든 모니터"로 두면 예전처럼 전부 잡는다.
+        _bounds = OverlayTarget.Resolve(AppSettings.CaptureMonitor);
+        _shot = ScreenGrabber.Capture(_bounds);
         _effects = new EffectCache(_shot);
         _context = new RenderContext { Effects = _effects };
 

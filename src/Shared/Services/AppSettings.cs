@@ -14,6 +14,25 @@ public static class AppSettings
     private const string Key = @"Software\LectureHelper";
     private const string SaveFolderValue = "SaveFolder";
     private const string OverlayMonitorValue = "OverlayMonitor";
+    private const string CaptureMonitorValue = "CaptureMonitor";
+
+    /// <summary>
+    /// ScreenCapture 가 캡처할 모니터. ScreenNote 와 따로 둔다 — 주석은 강의 화면에만 달지만
+    /// 캡처는 화면을 가로질러 잡고 싶을 때가 있어서 원하는 값이 서로 다를 수 있다.
+    /// </summary>
+    public static string CaptureMonitor
+    {
+        get
+        {
+            using var key = Registry.CurrentUser.OpenSubKey(Key);
+            return key?.GetValue(CaptureMonitorValue) as string ?? OverlayTarget.FollowCursor;
+        }
+        set
+        {
+            using var key = Registry.CurrentUser.CreateSubKey(Key);
+            key?.SetValue(CaptureMonitorValue, value);
+        }
+    }
 
     /// <summary>
     /// ScreenNote 오버레이가 덮을 모니터의 장치 이름.

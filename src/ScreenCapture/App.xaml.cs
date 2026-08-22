@@ -81,6 +81,10 @@ public partial class App : Application
         menu.Items.Add("화면 캡처  (Ctrl+F1)", null, (_, _) => StartCapture());
         menu.Items.Add("클립보드 이미지 고정  (F3)", null, (_, _) => PinFromClipboard());
         menu.Items.Add(new Forms::ToolStripSeparator());
+        menu.Items.Add(LectureHelper.Views.MonitorMenuItem.Create(
+            "캡처 화면",
+            () => AppSettings.CaptureMonitor,
+            v => AppSettings.CaptureMonitor = v));
         menu.Items.Add(BuildSaveFolderItem());
         menu.Items.Add(LectureHelper.Views.StartupMenuItem.Create(StartupName));
         menu.Items.Add("단축키 안내", null, (_, _) => ShowHelp());

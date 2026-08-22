@@ -84,7 +84,10 @@ public partial class App : Application
         menu.Items.Add("화면 주석  (Ctrl+2)", null, (_, _) => StartAnnotate());
         menu.Items.Add("수업 타이머  (Ctrl+3)", null, (_, _) => ToggleTimer());
         menu.Items.Add(new Forms::ToolStripSeparator());
-        menu.Items.Add(BuildMonitorItem());
+        menu.Items.Add(MonitorMenuItem.Create(
+            "오버레이 화면",
+            () => AppSettings.OverlayMonitor,
+            v => AppSettings.OverlayMonitor = v));
         menu.Items.Add(LectureHelper.Views.StartupMenuItem.Create(StartupName));
         menu.Items.Add("단축키 안내", null, (_, _) => ShowHelp());
         menu.Items.Add("종료", null, (_, _) => Shutdown());
@@ -101,50 +104,6 @@ public partial class App : Application
             if (args.Button == Forms::MouseButtons.Left) StartAnnotate();
         };
     }
-
-    /// <summary>
-    /// 확대·주석이 어느 모니터를 덮을지 고르는 메뉴.
-    /// 모니터는 연결이 바뀌므로 목록은 메뉴를 펼칠 때마다 새로 만든다.
-    /// </summary>
-    private static Forms::ToolStripMenuItem BuildMonitorItem()
-    {
-        var root = new Forms::ToolStripMenuItem { Text = MonitorLabel() };
-
-        root.DropDownOpening += (_, _) =>
-        {
-            root.DropDownItems.Clear();
-            string current = AppSettings.OverlayMonitor;
-
-            void Add(string text, string value, Forms::Screen? confirmOn = null)
-            {
-                var item = new Forms::ToolStripMenuItem(text) { Checked = value == current };
-                item.Click += (_, _) =>
-                {
-                    AppSettings.OverlayMonitor = value;
-                    root.Text = MonitorLabel();
-
-                    // 고른 화면에 번호를 잠깐 띄워 "이 화면이 맞나"를 확인시켜 준다.
-                    // 메뉴가 닫힌 뒤에 뜨므로 메뉴를 건드리지 않는다.
-                    if (confirmOn is not null) MonitorBadge.Flash(confirmOn);
-                };
-                root.DropDownItems.Add(item);
-            }
-
-            Add("마우스가 있는 모니터", OverlayTarget.FollowCursor);
-            root.DropDownItems.Add(new Forms::ToolStripSeparator());
-
-            foreach (var screen in OverlayTarget.Monitors)
-                Add(OverlayTarget.Describe(screen), screen.DeviceName, screen);
-
-            root.DropDownItems.Add(new Forms::ToolStripSeparator());
-            Add("모든 모니터 (예전 방식)", OverlayTarget.AllMonitors);
-        };
-
-        return root;
-    }
-
-    private static string MonitorLabel() =>
-        $"오버레이 화면:  {OverlayTarget.DescribeSetting(AppSettings.OverlayMonitor)}";
 
     private void SetupHotkeys()
     {
