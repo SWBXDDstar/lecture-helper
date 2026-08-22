@@ -48,9 +48,20 @@ public partial class App : Application
             args.Handled = true;
         };
 
+        // 트레이 메뉴 이벤트에서 던진 예외는 WPF Dispatcher가 못 잡고 프로세스를 조용히 죽인다.
+        // 트레이 아이콘이 사라져 수업 중에 프로그램이 없어진 것처럼 보인다.
+        Forms::Application.ThreadException += (_, args) =>
+        {
+            Log("WINFORMS: " + args.Exception);
+        };
+        Forms::Application.SetUnhandledExceptionMode(Forms::UnhandledExceptionMode.CatchException);
+
         StartupRegistration.RefreshIfMoved(StartupName);
         SetupTray();
         SetupHotkeys();
+
+        // 메뉴가 열린 뒤에 창을 처음 만들면 그 사이 메시지 펌프가 돌아 메뉴가 닫힐 수 있다.
+        MonitorBadge.Prepare();
     }
 
     internal static string LogPath => Path.Combine(Path.GetTempPath(), "ScreenNote.log");
@@ -104,37 +115,31 @@ public partial class App : Application
             root.DropDownItems.Clear();
             string current = AppSettings.OverlayMonitor;
 
-            Forms::ToolStripMenuItem Add(string text, string value)
+            void Add(string text, string value, Forms::Screen? confirmOn = null)
             {
                 var item = new Forms::ToolStripMenuItem(text) { Checked = value == current };
                 item.Click += (_, _) =>
                 {
                     AppSettings.OverlayMonitor = value;
                     root.Text = MonitorLabel();
+
+                    // 고른 화면에 번호를 잠깐 띄워 "이 화면이 맞나"를 확인시켜 준다.
+                    // 메뉴가 닫힌 뒤에 뜨므로 메뉴를 건드리지 않는다.
+                    if (confirmOn is not null) MonitorBadge.Flash(confirmOn);
                 };
                 root.DropDownItems.Add(item);
-                return item;
             }
 
             Add("마우스가 있는 모니터", OverlayTarget.FollowCursor);
             root.DropDownItems.Add(new Forms::ToolStripSeparator());
 
             foreach (var screen in OverlayTarget.Monitors)
-            {
-                var item = Add(OverlayTarget.Describe(screen), screen.DeviceName);
-
-                // 모니터가 넷이면 해상도가 다 같아 글자만으로는 못 고른다.
-                // 마우스를 올리면 그 화면에 번호를 띄워 어디인지 바로 보여준다.
-                var target = screen;
-                item.MouseEnter += (_, _) => MonitorBadge.ShowOn(target);
-                item.MouseLeave += (_, _) => MonitorBadge.HideBadge();
-            }
+                Add(OverlayTarget.Describe(screen), screen.DeviceName, screen);
 
             root.DropDownItems.Add(new Forms::ToolStripSeparator());
             Add("모든 모니터 (예전 방식)", OverlayTarget.AllMonitors);
         };
 
-        root.DropDownClosed += (_, _) => MonitorBadge.HideBadge();
         return root;
     }
 

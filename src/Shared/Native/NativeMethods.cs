@@ -40,8 +40,25 @@ public static class NativeMethods
         public POINT(int x, int y) { X = x; Y = y; }
     }
 
+    public const int GWL_EXSTYLE = -20;
+
+    /// <summary>클릭해도 활성화되지 않는 창. 트레이 메뉴가 떠 있는 동안 뱃지를 띄우려면 필요하다.</summary>
+    public const int WS_EX_NOACTIVATE = 0x08000000;
+
+    /// <summary>작업 표시줄과 Alt+Tab 목록에서 뺀다.</summary>
+    public const int WS_EX_TOOLWINDOW = 0x00000080;
+
+    /// <summary>마우스 입력을 아래 창으로 그대로 흘린다.</summary>
+    public const int WS_EX_TRANSPARENT = 0x00000020;
+
     [DllImport("user32.dll")]
     public static extern int GetSystemMetrics(int nIndex);
+
+    [DllImport("user32.dll", SetLastError = true)]
+    public static extern int GetWindowLong(IntPtr hWnd, int nIndex);
+
+    [DllImport("user32.dll", SetLastError = true)]
+    public static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
 
     [DllImport("user32.dll", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
