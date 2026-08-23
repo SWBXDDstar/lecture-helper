@@ -87,31 +87,13 @@ public static class DrawingShortcuts
         Key.M => ToolKind.Mosaic,
         Key.N => ToolKind.Number,
         Key.T => ToolKind.Text,
-        Key.Q => ToolKind.Question,
-        Key.S => ToolKind.Star,
-        Key.V => ToolKind.Check,
-        Key.X => ToolKind.Cross,
-        // O는 원래 주황색이었는데 안 쓰던 색이라 ○ 도장에 내줬다 (26.08.18).
-        // 글자 모양이 그대로 ○라 헷갈릴 일이 없다.
-        Key.O => ToolKind.Circle,
+        // Q S V X O 는 채점 도장이었는데 수업에서 거의 안 써서 뺐다 (26.08.23).
+        // X는 오버레이 나가기로, O는 원래 자리였던 주황색으로 돌아갔다.
         _ => null,
     };
 
     /// <summary>Tools that drop a mark on a single click instead of being dragged out.</summary>
-    public static bool IsStamp(ToolKind tool) =>
-        tool is ToolKind.Number or ToolKind.Question or ToolKind.Star
-             or ToolKind.Check or ToolKind.Cross or ToolKind.Circle;
-
-    /// <summary>Null for <see cref="ToolKind.Number"/>, which carries a counter instead of a glyph.</summary>
-    public static StampKind? StampFor(ToolKind tool) => tool switch
-    {
-        ToolKind.Question => StampKind.Question,
-        ToolKind.Star => StampKind.Star,
-        ToolKind.Check => StampKind.Check,
-        ToolKind.Cross => StampKind.Cross,
-        ToolKind.Circle => StampKind.Circle,
-        _ => null,
-    };
+    public static bool IsStamp(ToolKind tool) => tool is ToolKind.Number;
 
     public static string ToolLabel(ToolKind tool) => tool switch
     {
@@ -120,11 +102,6 @@ public static class DrawingShortcuts
         ToolKind.Blur => "흐리게",
         ToolKind.Number => "숫자",
         ToolKind.Text => "텍스트",
-        ToolKind.Question => "물음표",
-        ToolKind.Star => "별",
-        ToolKind.Check => "체크",
-        ToolKind.Cross => "X",
-        ToolKind.Circle => "동그라미",
         _ => "펜",
     };
 
@@ -136,7 +113,7 @@ public static class DrawingShortcuts
         Key.B => Color.FromRgb(0x29, 0x62, 0xFF),
         Key.Y => Color.FromRgb(0xFF, 0xD4, 0x00),
         Key.P => Color.FromRgb(0xFF, 0x40, 0x81),
-        // 주황(O)은 뺐다 — 안 쓰던 색이고 그 자리를 ○ 도장이 가져갔다 (26.08.18).
+        Key.O => Color.FromRgb(0xFF, 0x7A, 0x00),
         _ => null,
     };
 

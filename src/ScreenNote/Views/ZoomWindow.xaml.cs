@@ -25,7 +25,6 @@ public partial class ZoomWindow : Window
     private readonly NativeMethods.RECT _bounds;
     private readonly RenderContext _context;
     private readonly DrawingSession _session;
-    private readonly DispatcherTimer _hudTimer = new() { Interval = TimeSpan.FromSeconds(2) };
     private readonly DispatcherTimer _hintTimer = new() { Interval = TimeSpan.FromSeconds(5) };
 
     private readonly ScaleTransform _scale = new(2, 2);
@@ -66,7 +65,6 @@ public partial class ZoomWindow : Window
         Layer.Context = _context;
         Layer.Selection = new Rect(0, 0, _shot.PixelWidth, _shot.PixelHeight);
 
-        _hudTimer.Tick += (_, _) => { _hudTimer.Stop(); Hud.Visibility = Visibility.Collapsed; };
         _hintTimer.Tick += (_, _) => { _hintTimer.Stop(); HintBar.Visibility = Visibility.Collapsed; };
 
         TextEditor.PreviewKeyDown += TextEditorOnPreviewKeyDown;
@@ -96,9 +94,7 @@ public partial class ZoomWindow : Window
     protected override void OnContentRendered(EventArgs e)
     {
         base.OnContentRendered(e);
-        PositionOverlays();
-        ShowHint();
-        ShowHud();
+        PositionHintBar();
     }
 
     protected override void OnActivated(EventArgs e)
@@ -152,7 +148,6 @@ public partial class ZoomWindow : Window
         _offset = new Point(content.X - viewAnchor.X / _zoom, content.Y - viewAnchor.Y / _zoom);
 
         ApplyView();
-        ShowHud($"{_zoom * 100:0}%");
     }
 
     private void Anchor()
@@ -164,35 +159,20 @@ public partial class ZoomWindow : Window
     private void SyncCursor() =>
         Cursor = _session.IsTextMode ? Cursors.IBeam : (_anchored ? Cursors.Pen : Cursors.Cross);
 
-    // ------------------------------------------------------------------ hud
+    // ----------------------------------------------------------------- 안내
 
-    private void PositionOverlays()
+    private void PositionHintBar()
     {
-        Hud.UpdateLayout();
-        Canvas.SetLeft(Hud, (_shot.PixelWidth - Hud.ActualWidth) / 2);
-        Canvas.SetTop(Hud, 28);
-
         HintBar.UpdateLayout();
         Canvas.SetLeft(HintBar, (_shot.PixelWidth - HintBar.ActualWidth) / 2);
         Canvas.SetTop(HintBar, _shot.PixelHeight - HintBar.ActualHeight - 40);
     }
 
-    private void ShowHud(string? note = null)
-    {
-        HudSwatch.Background = new SolidColorBrush(_session.Color);
-        HudText.Text = note ?? (_anchored ? $"{_zoom * 100:0}%  ·  {_session.StatusText}" : $"{_zoom * 100:0}%");
-
-        Hud.Visibility = Visibility.Visible;
-        PositionOverlays();
-
-        _hudTimer.Stop();
-        _hudTimer.Start();
-    }
-
+    /// <summary>F1 로 불렀을 때만 뜬다. 발표 화면을 덮지 않으려고 저절로는 띄우지 않는다.</summary>
     private void ShowHint()
     {
         HintBar.Visibility = Visibility.Visible;
-        PositionOverlays();
+        PositionHintBar();
         _hintTimer.Stop();
         _hintTimer.Start();
     }
@@ -280,7 +260,6 @@ public partial class ZoomWindow : Window
             CommitText();
             _session.SetTool(ToolKind.None);
             SyncCursor();
-            ShowHud();
             return;
         }
 
@@ -299,9 +278,8 @@ public partial class ZoomWindow : Window
 
         if (toolWheel)
         {
-            string note = _session.Adjust(step);
+            _session.Adjust(step);
             if (TextEditor.Visibility == Visibility.Visible) TextEditor.FontSize = _session.FontSize * _zoom;
-            ShowHud(note);
             Layer.InvalidateVisual();
         }
         else
@@ -393,13 +371,15 @@ public partial class ZoomWindow : Window
 
         switch (e.Key)
         {
+            // X도 나가기다. 캔바 발표 중에 헛발질로 새어나가도 캔바가 무시하는 키라
+            // Esc처럼 발표 모드를 끝내버리지 않는다 (26.08.23).
             case Key.Escape:
+            case Key.X:
                 if (_session.Tool != ToolKind.None)
                 {
                     CommitText();
                     _session.SetTool(ToolKind.None);
                     SyncCursor();
-                    ShowHud();
                 }
                 else Close();
                 break;
@@ -407,7 +387,6 @@ public partial class ZoomWindow : Window
             case Key.E:
                 _session.EraseAll();
                 Layer.InvalidateVisual();
-                ShowHud("전체 지움");
                 break;
 
             case Key.F1: ShowHint(); break;
@@ -420,15 +399,13 @@ public partial class ZoomWindow : Window
                 CommitText();
                 _anchored = false;
                 SyncCursor();
-                ShowHud("따라가기");
                 break;
 
             default:
-                if (!_session.HandleKey(e.Key, shift, out string? note)) return;
+                if (!_session.HandleKey(e.Key, shift, out _)) return;
                 CommitText();
                 Anchor();
                 SyncCursor();
-                ShowHud(note);
                 Layer.InvalidateVisual();
                 break;
         }
@@ -440,7 +417,6 @@ public partial class ZoomWindow : Window
     {
         base.OnClosing(e);
         _closing = true;
-        _hudTimer.Stop();
         _hintTimer.Stop();
     }
 

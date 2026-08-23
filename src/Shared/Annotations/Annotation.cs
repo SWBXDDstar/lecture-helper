@@ -9,8 +9,7 @@ namespace LectureHelper.Annotations;
 
 public enum ToolKind
 {
-    None, Pen, Highlighter, Line, Arrow, Rectangle, Ellipse, Mosaic, Blur, Number, Text,
-    Question, Star, Check, Cross, Circle
+    None, Pen, Highlighter, Line, Arrow, Rectangle, Ellipse, Mosaic, Blur, Number, Text
 }
 
 public sealed class RenderContext
@@ -181,122 +180,6 @@ public sealed class NumberAnnotation : Annotation
             radius * 1.25, Brushes.White, 96);
 
         dc.DrawText(text, new Point(Center.X - text.Width / 2, Center.Y - text.Height / 2));
-    }
-}
-
-public enum StampKind { Question, Star, Check, Cross, Circle }
-
-/// <summary>
-/// A one-click mark. Drawn opaque with a white rim so it stays legible over slides, photos and
-/// dark backgrounds alike — these get stamped onto whatever happens to be on screen.
-/// </summary>
-public sealed class StampAnnotation : Annotation
-{
-    public Point Center { get; set; }
-    public StampKind Kind { get; set; }
-
-    private double Radius => Math.Max(Thickness * 3.2, 14);
-
-    public override void Render(DrawingContext dc, RenderContext ctx)
-    {
-        var fill = new SolidColorBrush(Color);
-        var rim = new Pen(Brushes.White, Math.Max(Radius * 0.14, 2));
-        rim.Freeze();
-
-        switch (Kind)
-        {
-            case StampKind.Star: RenderStar(dc, fill, rim); break;
-            case StampKind.Check: RenderCheck(dc, fill, rim); break;
-            case StampKind.Cross: RenderCross(dc, fill, rim); break;
-            case StampKind.Circle: RenderCircle(dc, fill, rim); break;
-            default: RenderGlyph(dc, fill, rim, "?"); break;
-        }
-    }
-
-    private void RenderStar(DrawingContext dc, Brush fill, Pen rim)
-    {
-        double outer = Radius;
-        double inner = outer * 0.42;
-
-        var geometry = new StreamGeometry();
-        using (var g = geometry.Open())
-        {
-            for (int i = 0; i < 10; i++)
-            {
-                // Start at -90 degrees so a point faces up.
-                double angle = -Math.PI / 2 + i * Math.PI / 5;
-                double r = i % 2 == 0 ? outer : inner;
-                var p = new Point(Center.X + Math.Cos(angle) * r, Center.Y + Math.Sin(angle) * r);
-
-                if (i == 0) g.BeginFigure(p, true, true);
-                else g.LineTo(p, true, true);
-            }
-        }
-        geometry.Freeze();
-        dc.DrawGeometry(fill, rim, geometry);
-    }
-
-    /// <summary>X 표시. 체크와 짝이라 같은 원 안에 흰 획으로 그린다.</summary>
-    private void RenderCross(DrawingContext dc, Brush fill, Pen rim)
-    {
-        dc.DrawEllipse(fill, rim, Center, Radius, Radius);
-
-        var stroke = new Pen(Brushes.White, Radius * 0.30)
-        {
-            StartLineCap = PenLineCap.Round,
-            EndLineCap = PenLineCap.Round,
-        };
-        stroke.Freeze();
-
-        double d = Radius * 0.40;
-        dc.DrawLine(stroke, new Point(Center.X - d, Center.Y - d), new Point(Center.X + d, Center.Y + d));
-        dc.DrawLine(stroke, new Point(Center.X + d, Center.Y - d), new Point(Center.X - d, Center.Y + d));
-    }
-
-    /// <summary>채점용 ○. 체크·엑스와 같은 원 안에 흰 고리를 넣어 한 가족으로 보이게 한다.</summary>
-    private void RenderCircle(DrawingContext dc, Brush fill, Pen rim)
-    {
-        dc.DrawEllipse(fill, rim, Center, Radius, Radius);
-
-        var ring = new Pen(Brushes.White, Radius * 0.26);
-        ring.Freeze();
-        dc.DrawEllipse(null, ring, Center, Radius * 0.44, Radius * 0.44);
-    }
-
-    private void RenderGlyph(DrawingContext dc, Brush fill, Pen rim, string glyph)
-    {
-        dc.DrawEllipse(fill, rim, Center, Radius, Radius);
-
-        var text = new FormattedText(
-            glyph, CultureInfo.InvariantCulture, FlowDirection.LeftToRight,
-            new Typeface(new FontFamily("Segoe UI"), FontStyles.Normal, FontWeights.Bold, FontStretches.Normal),
-            Radius * 1.6, Brushes.White, 96);
-
-        dc.DrawText(text, new Point(Center.X - text.Width / 2, Center.Y - text.Height / 2));
-    }
-
-    /// <summary>A tick drawn as strokes rather than a glyph — fonts render ✓ inconsistently.</summary>
-    private void RenderCheck(DrawingContext dc, Brush fill, Pen rim)
-    {
-        dc.DrawEllipse(fill, rim, Center, Radius, Radius);
-
-        var tick = new Pen(Brushes.White, Radius * 0.30)
-        {
-            StartLineCap = PenLineCap.Round,
-            EndLineCap = PenLineCap.Round,
-            LineJoin = PenLineJoin.Round,
-        };
-        tick.Freeze();
-
-        var geometry = new StreamGeometry();
-        using (var g = geometry.Open())
-        {
-            g.BeginFigure(new Point(Center.X - Radius * 0.42, Center.Y + Radius * 0.02), false, false);
-            g.LineTo(new Point(Center.X - Radius * 0.12, Center.Y + Radius * 0.36), true, true);
-            g.LineTo(new Point(Center.X + Radius * 0.46, Center.Y - Radius * 0.36), true, true);
-        }
-        geometry.Freeze();
-        dc.DrawGeometry(null, tick, geometry);
     }
 }
 

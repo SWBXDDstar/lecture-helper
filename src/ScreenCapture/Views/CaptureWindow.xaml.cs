@@ -100,7 +100,7 @@ public partial class CaptureWindow : Window
         _hintTimer.Tick += (_, _) =>
         {
             _hintTimer.Stop();
-            if (_hasSelection) HintBar.Visibility = Visibility.Collapsed;
+            HintBar.Visibility = Visibility.Collapsed;
         };
     }
 
@@ -192,11 +192,6 @@ public partial class CaptureWindow : Window
         BtnMosaic.Click += (_, _) => SetTool(ToolKind.Mosaic);
         BtnBlur.Click += (_, _) => SetTool(ToolKind.Blur);
         BtnNumber.Click += (_, _) => SetTool(ToolKind.Number);
-        BtnQuestion.Click += (_, _) => SetTool(ToolKind.Question);
-        BtnStar.Click += (_, _) => SetTool(ToolKind.Star);
-        BtnCheck.Click += (_, _) => SetTool(ToolKind.Check);
-        BtnCross.Click += (_, _) => SetTool(ToolKind.Cross);
-        BtnCircle.Click += (_, _) => SetTool(ToolKind.Circle);
         BtnText.Click += (_, _) => SetTool(ToolKind.Text);
 
         BtnColor.Click += (_, _) =>
@@ -234,11 +229,6 @@ public partial class CaptureWindow : Window
         BtnMosaic.IsChecked = _tool == ToolKind.Mosaic;
         BtnBlur.IsChecked = _tool == ToolKind.Blur;
         BtnNumber.IsChecked = _tool == ToolKind.Number;
-        BtnQuestion.IsChecked = _tool == ToolKind.Question;
-        BtnStar.IsChecked = _tool == ToolKind.Star;
-        BtnCheck.IsChecked = _tool == ToolKind.Check;
-        BtnCross.IsChecked = _tool == ToolKind.Cross;
-        BtnCircle.IsChecked = _tool == ToolKind.Circle;
         BtnText.IsChecked = _tool == ToolKind.Text;
 
         ColorPalette.Visibility = Visibility.Collapsed;
@@ -546,12 +536,11 @@ public partial class CaptureWindow : Window
             SizeLabel.Visibility = Visibility.Collapsed;
             Toolbar.Visibility = Visibility.Collapsed;
             ColorPalette.Visibility = Visibility.Collapsed;
-            HintBar.Visibility = Visibility.Visible;
             foreach (var handle in _handles) handle.Visibility = Visibility.Collapsed;
             return;
         }
 
-        // Once a selection exists the hint only stays up while F1 is holding it open.
+        // 안내는 F1이 띄우는 동안에만 떠 있다. 저절로는 뜨지 않는다.
         if (!_hintTimer.IsEnabled) HintBar.Visibility = Visibility.Collapsed;
 
         SelectionBorder.Visibility = Visibility.Visible;
@@ -770,18 +759,16 @@ public partial class CaptureWindow : Window
             return;
         }
 
-        // Stamps land on a single click; nothing is dragged out.
+        // 숫자 마커는 끌지 않고 클릭 한 번에 찍힌다.
         if (DrawingShortcuts.IsStamp(_tool))
         {
-            Layer.Items.Add(DrawingShortcuts.StampFor(_tool) is { } stamp
-                ? new StampAnnotation { Center = p, Kind = stamp, Color = _color, Thickness = _thickness }
-                : new NumberAnnotation
-                {
-                    Center = p,
-                    Value = Layer.Items.OfType<NumberAnnotation>().Count() + 1,
-                    Color = _color,
-                    Thickness = _thickness,
-                });
+            Layer.Items.Add(new NumberAnnotation
+            {
+                Center = p,
+                Value = Layer.Items.OfType<NumberAnnotation>().Count() + 1,
+                Color = _color,
+                Thickness = _thickness,
+            });
 
             _redo.Clear();
             UpdateUndoRedoState();
@@ -1129,7 +1116,9 @@ public partial class CaptureWindow : Window
 
         switch (e.Key)
         {
+            // ScreenNote와 같은 키. 캔바 발표 중에 새어나가도 안전한 글자다 (26.08.23).
             case Key.Escape:
+            case Key.X:
                 if (_tool != ToolKind.None) SetTool(ToolKind.None);
                 else if (_hasSelection) SetSelection(Rect.Empty);
                 else Close();

@@ -30,17 +30,8 @@
                      Padding="2,0" MinWidth="40" AcceptsReturn="True" CaretBrush="White"
                      FontFamily="Malgun Gothic" FontWeight="Bold" Cursor="IBeam"/>
 
-            <Border x:Name="Hud" Style="{StaticResource HudPanel}" IsHitTestVisible="False">
-                <StackPanel Orientation="Horizontal">
-                    <Border x:Name="HudSwatch" Width="16" Height="16" CornerRadius="3"
-                            BorderBrush="#FF9AA3AE" BorderThickness="1" Background="Red"
-                            VerticalAlignment="Center"/>
-                    <TextBlock x:Name="HudText" Foreground="#FFDDE3EA" FontSize="13" Margin="9,0,0,0"
-                               VerticalAlignment="Center"/>
-                </StackPanel>
-            </Border>
-
-            <Border x:Name="HintBar" Style="{StaticResource HudPanel}" IsHitTestVisible="False">
+            <Border x:Name="HintBar" Style="{StaticResource HudPanel}" IsHitTestVisible="False"
+                    Visibility="Collapsed">
                 <TextBlock Foreground="#FFDDE3EA" FontSize="12" LineHeight="19">
                     <Run Text="드래그" FontWeight="Bold"/><Run Text=" 펜   "/>
                     <Run Text="Ctrl" FontWeight="Bold"/><Run Text=" 네모   "/>
@@ -49,21 +40,18 @@
                     <Run Text="Ctrl+Shift" FontWeight="Bold"/><Run Text=" 화살표"/>
                     <LineBreak/>
                     <Run Text="휠" FontWeight="Bold"/><Run Text=" 두께   "/>
-                    <Run Text="R G B Y P" FontWeight="Bold"/><Run Text=" 색상   "/>
+                    <Run Text="R G B Y P O" FontWeight="Bold"/><Run Text=" 색상   "/>
                     <Run Text="H" FontWeight="Bold"/><Run Text=" 형광펜   "/>
                     <Run Text="M" FontWeight="Bold"/><Run Text=" 모자이크   "/>
                     <Run Text="Shift+M" FontWeight="Bold"/><Run Text=" 흐리게   "/>
                     <Run Text="N" FontWeight="Bold"/><Run Text=" 숫자   "/>
                     <Run Text="T" FontWeight="Bold"/><Run Text=" 텍스트   "/>
-                    <Run Text="Q" FontWeight="Bold"/><Run Text=" 물음표   "/>
-                    <Run Text="S" FontWeight="Bold"/><Run Text=" 별   "/>
-                    <Run Text="V" FontWeight="Bold"/><Run Text=" 체크   "/><Run Text="X" FontWeight="Bold"/><Run Text=" 엑스   "/><Run Text="O" FontWeight="Bold"/><Run Text=" 동그라미"/>
                     <LineBreak/>
                     <Run Text="E" FontWeight="Bold"/><Run Text=" 전체 지우기   "/>
                     <Run Text="Ctrl+Z" FontWeight="Bold"/><Run Text=" 되돌리기   "/>
                     <Run Text="오른쪽 클릭" FontWeight="Bold"/><Run Text=" 도구 해제   "/>
                     <Run Text="F1" FontWeight="Bold"/><Run Text=" 이 안내   "/>
-                    <Run Text="Esc" FontWeight="Bold"/><Run Text=" 나가기"/>
+                    <Run Text="Esc / X" FontWeight="Bold"/><Run Text=" 나가기"/>
                 </TextBlock>
             </Border>
 

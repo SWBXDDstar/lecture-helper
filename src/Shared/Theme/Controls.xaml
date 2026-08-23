@@ -92,7 +92,7 @@
         <Setter Property="Height" Value="17"/>
     </Style>
 
-    <!-- Floating status pill used by the live annotation HUD. -->
+    <!-- F1 안내박스가 쓰는 떠 있는 판. 상태 표시 HUD도 이걸 썼는데 HUD는 없앴다 (26.08.23). -->
     <Style x:Key="HudPanel" TargetType="Border">
         <Setter Property="Background" Value="#E6101317"/>
         <Setter Property="CornerRadius" Value="6"/>

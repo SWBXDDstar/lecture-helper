@@ -75,15 +75,13 @@ public sealed class DrawingSession
     {
         if (DrawingShortcuts.IsStamp(Tool))
         {
-            Add(DrawingShortcuts.StampFor(Tool) is { } stamp
-                ? new StampAnnotation { Center = origin, Kind = stamp, Color = Color, Thickness = Thickness }
-                : new NumberAnnotation
-                {
-                    Center = origin,
-                    Value = _items.OfType<NumberAnnotation>().Count() + 1,
-                    Color = Color,
-                    Thickness = Thickness,
-                });
+            Add(new NumberAnnotation
+            {
+                Center = origin,
+                Value = _items.OfType<NumberAnnotation>().Count() + 1,
+                Color = Color,
+                Thickness = Thickness,
+            });
             return false;
         }
 
@@ -164,6 +162,7 @@ public sealed class DrawingSession
         return false;
     }
 
+    // HUD를 없애면서(26.08.23) 이걸 화면에 띄우는 곳이 사라졌다. 두께는 감으로 맞춘다.
     public string StatusText => Tool switch
     {
         ToolKind.None => $"두께 {Thickness:0}",
