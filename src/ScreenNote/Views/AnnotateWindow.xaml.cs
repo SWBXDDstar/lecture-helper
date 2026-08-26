@@ -96,9 +96,15 @@ public partial class AnnotateWindow : Window
         Canvas.SetTop(HintBar, _shot.PixelHeight - HintBar.ActualHeight - 40);
     }
 
-    /// <summary>F1 로 불렀을 때만 뜬다. 발표 화면을 덮지 않으려고 저절로는 띄우지 않는다.</summary>
+    /// <summary>
+    /// F1 로 불렀을 때만 뜬다. 발표 화면을 덮지 않으려고 저절로는 띄우지 않는다.
+    /// 지금 색·두께도 같이 보여준다 — 저절로 뜨던 알약을 없앤 대신 여기서 한 번에 확인한다.
+    /// </summary>
     private void ShowHint()
     {
+        HintSwatch.Background = new SolidColorBrush(_session.Color);
+        HintStatus.Text = _session.StatusText;
+
         HintBar.Visibility = Visibility.Visible;
         PositionHintBar();
         _hintTimer.Stop();

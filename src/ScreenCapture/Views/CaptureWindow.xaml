@@ -58,6 +58,14 @@
 
             <Border x:Name="HintBar" Background="#D9101317" CornerRadius="6" Padding="12,7"
                     IsHitTestVisible="False" Visibility="Collapsed">
+                <StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,7">
+                    <Border x:Name="HintSwatch" Width="15" Height="15" CornerRadius="3"
+                            BorderBrush="#FF9AA3AE" BorderThickness="1" Background="Red"
+                            VerticalAlignment="Center"/>
+                    <TextBlock x:Name="HintStatus" Foreground="#FFF2F6FA" FontSize="13"
+                               FontWeight="Bold" Margin="8,0,0,0" VerticalAlignment="Center"/>
+                </StackPanel>
                 <TextBlock Foreground="#FFDDE3EA" FontSize="12" LineHeight="19">
                     <Run Text="드래그" FontWeight="Bold"/><Run Text=" 영역 선택   "/>
                     <Run Text="클릭" FontWeight="Bold"/><Run Text=" 창 전체 선택   "/>
@@ -79,6 +87,7 @@
                     <Run Text="F1" FontWeight="Bold"/><Run Text=" 이 안내   "/>
                     <Run Text="Esc / X" FontWeight="Bold"/><Run Text=" 취소"/>
                 </TextBlock>
+                </StackPanel>
             </Border>
 
             <TextBox x:Name="TextEditor" Visibility="Collapsed"

@@ -162,7 +162,7 @@ public sealed class DrawingSession
         return false;
     }
 
-    // HUD를 없애면서(26.08.23) 이걸 화면에 띄우는 곳이 사라졌다. 두께는 감으로 맞춘다.
+    /// <summary>F1 안내 맨 윗줄에 뜨는 한 줄. 저절로는 안 뜨고 불렀을 때만 보인다.</summary>
     public string StatusText => Tool switch
     {
         ToolKind.None => $"두께 {Thickness:0}",

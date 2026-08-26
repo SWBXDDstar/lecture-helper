@@ -665,8 +665,18 @@ public partial class CaptureWindow : Window
         Canvas.SetTop(HintBar, 40);
     }
 
+    /// <summary>F1 로 불렀을 때만 뜬다. 지금 색·두께도 같이 보여준다.</summary>
     private void ShowHint()
     {
+        HintSwatch.Background = new SolidColorBrush(_color);
+        HintStatus.Text = _tool switch
+        {
+            ToolKind.None => $"두께 {_thickness:0}",
+            ToolKind.Text => $"텍스트 · 글자 {_fontSize:0}",
+            ToolKind.Mosaic or ToolKind.Blur => $"{DrawingShortcuts.ToolLabel(_tool)} · 세기 {_effectStrength}",
+            _ => $"{DrawingShortcuts.ToolLabel(_tool)} · 두께 {_thickness:0}",
+        };
+
         HintBar.Visibility = Visibility.Visible;
         PositionHintBar();
         _hintTimer.Stop();
