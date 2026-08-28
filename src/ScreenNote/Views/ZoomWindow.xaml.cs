@@ -65,7 +65,12 @@ public partial class ZoomWindow : Window
         Layer.Context = _context;
         Layer.Selection = new Rect(0, 0, _shot.PixelWidth, _shot.PixelHeight);
 
-        _hintTimer.Tick += (_, _) => { _hintTimer.Stop(); HintBar.Visibility = Visibility.Collapsed; };
+        _hintTimer.Tick += (_, _) =>
+        {
+            _hintTimer.Stop();
+            StatusBar.Visibility = Visibility.Collapsed;
+            HintBar.Visibility = Visibility.Collapsed;
+        };
 
         TextEditor.PreviewKeyDown += TextEditorOnPreviewKeyDown;
         TextEditor.LostKeyboardFocus += (_, _) => CommitText();
@@ -119,6 +124,7 @@ public partial class ZoomWindow : Window
             Math.Clamp(cursor.Y / _shot.PixelHeight, 0, 1) * maxY);
 
         ApplyView();
+        SyncHintIfVisible();
     }
 
     private void ApplyView()
@@ -150,6 +156,26 @@ public partial class ZoomWindow : Window
         ApplyView();
     }
 
+    private void RefreshStatus()
+    {
+        HintSwatch.Background = new SolidColorBrush(_session.Color);
+        HintStatus.Text = $"{_zoom * 100:0}%  ·  {_session.StatusText}";
+    }
+
+    /// <summary>
+    /// 안내가 떠 있는 동안 배율·색·두께가 바뀌면 숫자도 따라가게 한다.
+    /// 안내가 숨어 있으면 아무 일도 안 한다 — 저절로 뜨는 일은 없다.
+    /// </summary>
+    private void SyncHintIfVisible()
+    {
+        if (StatusBar.Visibility != Visibility.Visible) return;
+
+        RefreshStatus();
+        PositionHintBar();
+        _hintTimer.Stop();
+        _hintTimer.Start();
+    }
+
     private void Anchor()
     {
         _anchored = true;
@@ -161,8 +187,13 @@ public partial class ZoomWindow : Window
 
     // ----------------------------------------------------------------- 안내
 
+    /// <summary>상태는 위, 안내는 아래. 옛 HUD가 있던 자리를 상태줄이 그대로 물려받았다.</summary>
     private void PositionHintBar()
     {
+        StatusBar.UpdateLayout();
+        Canvas.SetLeft(StatusBar, (_shot.PixelWidth - StatusBar.ActualWidth) / 2);
+        Canvas.SetTop(StatusBar, 28);
+
         HintBar.UpdateLayout();
         Canvas.SetLeft(HintBar, (_shot.PixelWidth - HintBar.ActualWidth) / 2);
         Canvas.SetTop(HintBar, _shot.PixelHeight - HintBar.ActualHeight - 40);
@@ -174,9 +205,9 @@ public partial class ZoomWindow : Window
     /// </summary>
     private void ShowHint()
     {
-        HintSwatch.Background = new SolidColorBrush(_session.Color);
-        HintStatus.Text = $"{_zoom * 100:0}%  ·  {_session.StatusText}";
+        RefreshStatus();
 
+        StatusBar.Visibility = Visibility.Visible;
         HintBar.Visibility = Visibility.Visible;
         PositionHintBar();
         _hintTimer.Stop();
@@ -266,6 +297,7 @@ public partial class ZoomWindow : Window
             CommitText();
             _session.SetTool(ToolKind.None);
             SyncCursor();
+            SyncHintIfVisible();
             return;
         }
 
@@ -286,6 +318,7 @@ public partial class ZoomWindow : Window
         {
             _session.Adjust(step);
             if (TextEditor.Visibility == Visibility.Visible) TextEditor.FontSize = _session.FontSize * _zoom;
+            SyncHintIfVisible();
             Layer.InvalidateVisual();
         }
         else
@@ -412,6 +445,7 @@ public partial class ZoomWindow : Window
                 CommitText();
                 Anchor();
                 SyncCursor();
+                SyncHintIfVisible();
                 Layer.InvalidateVisual();
                 break;
         }

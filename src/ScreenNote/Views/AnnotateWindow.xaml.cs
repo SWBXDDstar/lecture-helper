@@ -51,7 +51,12 @@ public partial class AnnotateWindow : Window
         Layer.Context = _context;
         Layer.Selection = new Rect(0, 0, _shot.PixelWidth, _shot.PixelHeight);
 
-        _hintTimer.Tick += (_, _) => { _hintTimer.Stop(); HintBar.Visibility = Visibility.Collapsed; };
+        _hintTimer.Tick += (_, _) =>
+        {
+            _hintTimer.Stop();
+            StatusBar.Visibility = Visibility.Collapsed;
+            HintBar.Visibility = Visibility.Collapsed;
+        };
 
         TextEditor.PreviewKeyDown += TextEditorOnPreviewKeyDown;
         TextEditor.LostKeyboardFocus += (_, _) => CommitText();
@@ -89,8 +94,13 @@ public partial class AnnotateWindow : Window
 
     // ----------------------------------------------------------------- 안내
 
+    /// <summary>상태는 위, 안내는 아래. 옛 HUD가 있던 자리를 상태줄이 그대로 물려받았다.</summary>
     private void PositionHintBar()
     {
+        StatusBar.UpdateLayout();
+        Canvas.SetLeft(StatusBar, (_shot.PixelWidth - StatusBar.ActualWidth) / 2);
+        Canvas.SetTop(StatusBar, 28);
+
         HintBar.UpdateLayout();
         Canvas.SetLeft(HintBar, (_shot.PixelWidth - HintBar.ActualWidth) / 2);
         Canvas.SetTop(HintBar, _shot.PixelHeight - HintBar.ActualHeight - 40);
@@ -102,10 +112,30 @@ public partial class AnnotateWindow : Window
     /// </summary>
     private void ShowHint()
     {
+        RefreshStatus();
+
+        StatusBar.Visibility = Visibility.Visible;
+        HintBar.Visibility = Visibility.Visible;
+        PositionHintBar();
+        _hintTimer.Stop();
+        _hintTimer.Start();
+    }
+
+    private void RefreshStatus()
+    {
         HintSwatch.Background = new SolidColorBrush(_session.Color);
         HintStatus.Text = _session.StatusText;
+    }
 
-        HintBar.Visibility = Visibility.Visible;
+    /// <summary>
+    /// 안내가 떠 있는 동안 색·두께가 바뀌면 숫자도 따라가게 한다. 휠을 굴리면서 값을 보려면
+    /// 이게 있어야 한다. 안내가 숨어 있으면 아무 일도 안 한다 — 저절로 뜨는 일은 없다.
+    /// </summary>
+    private void SyncHintIfVisible()
+    {
+        if (StatusBar.Visibility != Visibility.Visible) return;
+
+        RefreshStatus();
         PositionHintBar();
         _hintTimer.Stop();
         _hintTimer.Start();
@@ -188,6 +218,7 @@ public partial class AnnotateWindow : Window
             CommitText();
             _session.SetTool(ToolKind.None);
             SyncCursor();
+            SyncHintIfVisible();
             return;
         }
 
@@ -200,6 +231,7 @@ public partial class AnnotateWindow : Window
 
         _session.Adjust(Math.Sign(e.Delta));
         if (TextEditor.Visibility == Visibility.Visible) TextEditor.FontSize = _session.FontSize;
+        SyncHintIfVisible();
 
         Layer.InvalidateVisual();
         e.Handled = true;
@@ -308,6 +340,7 @@ public partial class AnnotateWindow : Window
                 if (!_session.HandleKey(e.Key, shift, out _)) return;
                 CommitText();
                 SyncCursor();
+                SyncHintIfVisible();
                 Layer.InvalidateVisual();
                 break;
         }

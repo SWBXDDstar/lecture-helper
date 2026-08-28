@@ -31,16 +31,19 @@
                      Padding="2,0" MinWidth="40" AcceptsReturn="True" CaretBrush="White"
                      FontFamily="Malgun Gothic" FontWeight="Bold" Cursor="IBeam"/>
 
-            <Border x:Name="HintBar" Style="{StaticResource HudPanel}" IsHitTestVisible="False"
+            <Border x:Name="StatusBar" Style="{StaticResource HudPanel}" IsHitTestVisible="False"
                     Visibility="Collapsed">
-                <StackPanel>
-                <StackPanel Orientation="Horizontal" Margin="0,0,0,7">
+                <StackPanel Orientation="Horizontal">
                     <Border x:Name="HintSwatch" Width="15" Height="15" CornerRadius="3"
                             BorderBrush="#FF9AA3AE" BorderThickness="1" Background="Red"
                             VerticalAlignment="Center"/>
                     <TextBlock x:Name="HintStatus" Foreground="#FFF2F6FA" FontSize="13"
                                FontWeight="Bold" Margin="8,0,0,0" VerticalAlignment="Center"/>
                 </StackPanel>
+            </Border>
+
+            <Border x:Name="HintBar" Style="{StaticResource HudPanel}" IsHitTestVisible="False"
+                    Visibility="Collapsed">
                 <TextBlock Foreground="#FFDDE3EA" FontSize="12" LineHeight="19">
                     <Run Text="마우스" FontWeight="Bold"/><Run Text=" 확대 위치 이동   "/>
                     <Run Text="휠" FontWeight="Bold"/><Run Text=" 배율   "/>
@@ -64,7 +67,6 @@
                     <Run Text="F1" FontWeight="Bold"/><Run Text=" 이 안내   "/>
                     <Run Text="Esc / X" FontWeight="Bold"/><Run Text=" 나가기"/>
                 </TextBlock>
-                </StackPanel>
             </Border>
 
         </Canvas>

@@ -100,6 +100,7 @@ public partial class CaptureWindow : Window
         _hintTimer.Tick += (_, _) =>
         {
             _hintTimer.Stop();
+            StatusBar.Visibility = Visibility.Collapsed;
             HintBar.Visibility = Visibility.Collapsed;
         };
     }
@@ -243,6 +244,7 @@ public partial class CaptureWindow : Window
         if (TextEditor.Visibility == Visibility.Visible)
             TextEditor.Foreground = new SolidColorBrush(color);
         UpdateCursorPreview();
+        SyncHintIfVisible();
     }
 
     private bool IsEffectTool => _tool is ToolKind.Mosaic or ToolKind.Blur;
@@ -250,8 +252,33 @@ public partial class CaptureWindow : Window
     private bool IsStrokeTool => _tool is ToolKind.Pen or ToolKind.Highlighter or ToolKind.Line
         or ToolKind.Arrow or ToolKind.Rectangle or ToolKind.Ellipse;
 
+    private void RefreshStatus()
+    {
+        HintSwatch.Background = new SolidColorBrush(_color);
+        HintStatus.Text = _tool switch
+        {
+            ToolKind.None => $"두께 {_thickness:0}",
+            ToolKind.Text => $"텍스트 · 글자 {_fontSize:0}",
+            ToolKind.Mosaic or ToolKind.Blur => $"{DrawingShortcuts.ToolLabel(_tool)} · 세기 {_effectStrength}",
+            _ => $"{DrawingShortcuts.ToolLabel(_tool)} · 두께 {_thickness:0}",
+        };
+    }
+
+    /// <summary>안내가 떠 있는 동안에만 숫자를 따라가게 한다. 숨어 있으면 아무 일도 안 한다.</summary>
+    private void SyncHintIfVisible()
+    {
+        if (StatusBar.Visibility != Visibility.Visible) return;
+
+        RefreshStatus();
+        PositionHintBar();
+        _hintTimer.Stop();
+        _hintTimer.Start();
+    }
+
     private void UpdateSizeReadout()
     {
+        SyncHintIfVisible();
+
         SizeReadout.Text = _tool switch
         {
             ToolKind.None => "휠: 굵기",
@@ -541,7 +568,11 @@ public partial class CaptureWindow : Window
         }
 
         // 안내는 F1이 띄우는 동안에만 떠 있다. 저절로는 뜨지 않는다.
-        if (!_hintTimer.IsEnabled) HintBar.Visibility = Visibility.Collapsed;
+        if (!_hintTimer.IsEnabled)
+        {
+            StatusBar.Visibility = Visibility.Collapsed;
+            HintBar.Visibility = Visibility.Collapsed;
+        }
 
         SelectionBorder.Visibility = Visibility.Visible;
         SelectionBorder.Width = _selection.Width;
@@ -658,25 +689,24 @@ public partial class CaptureWindow : Window
         Canvas.SetTop(ColorPalette, y);
     }
 
+    /// <summary>상태는 위, 안내는 아래. ScreenNote와 같은 자리에 둔다.</summary>
     private void PositionHintBar()
     {
+        StatusBar.UpdateLayout();
+        Canvas.SetLeft(StatusBar, (_shot.PixelWidth - StatusBar.ActualWidth) / 2);
+        Canvas.SetTop(StatusBar, 40);
+
         HintBar.UpdateLayout();
         Canvas.SetLeft(HintBar, (_shot.PixelWidth - HintBar.ActualWidth) / 2);
-        Canvas.SetTop(HintBar, 40);
+        Canvas.SetTop(HintBar, _shot.PixelHeight - HintBar.ActualHeight - 40);
     }
 
     /// <summary>F1 로 불렀을 때만 뜬다. 지금 색·두께도 같이 보여준다.</summary>
     private void ShowHint()
     {
-        HintSwatch.Background = new SolidColorBrush(_color);
-        HintStatus.Text = _tool switch
-        {
-            ToolKind.None => $"두께 {_thickness:0}",
-            ToolKind.Text => $"텍스트 · 글자 {_fontSize:0}",
-            ToolKind.Mosaic or ToolKind.Blur => $"{DrawingShortcuts.ToolLabel(_tool)} · 세기 {_effectStrength}",
-            _ => $"{DrawingShortcuts.ToolLabel(_tool)} · 두께 {_thickness:0}",
-        };
+        RefreshStatus();
 
+        StatusBar.Visibility = Visibility.Visible;
         HintBar.Visibility = Visibility.Visible;
         PositionHintBar();
         _hintTimer.Stop();
