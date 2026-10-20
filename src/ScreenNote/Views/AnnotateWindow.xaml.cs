@@ -28,6 +28,7 @@ public partial class AnnotateWindow : Window
     private bool _drawing;
     private bool _closing;
     private bool _activated;
+    private readonly ForegroundRestorer _foreground = new();
 
     public AnnotateWindow()
     {
@@ -233,6 +234,9 @@ public partial class AnnotateWindow : Window
         if (TextEditor.Visibility == Visibility.Visible) TextEditor.FontSize = _session.FontSize;
         SyncHintIfVisible();
 
+        if (_session.WheelIsThickness)
+            Layer.FlashSize(e.GetPosition(Surface), _session.Color, _session.BrushDiameter);
+
         Layer.InvalidateVisual();
         e.Handled = true;
     }
@@ -352,6 +356,8 @@ public partial class AnnotateWindow : Window
     {
         base.OnClosing(e);
         _closing = true;
+        // 아직 오버레이가 화면을 덮고 있을 때 포커스를 돌려줘야, 닫히는 순간 깜빡이지 않는다.
+        _foreground.Restore();
         _hintTimer.Stop();
     }
 
@@ -360,8 +366,13 @@ public partial class AnnotateWindow : Window
         base.OnDeactivated(e);
         if (!_activated || _closing) return;
 
-        // Something stole focus mid-lesson. Reclaim it rather than wipe what is on the board.
-        if (Layer.Items.Count > 0) Activate();
-        else Close();
+        // 알림 풍선·다른 창이 포커스를 가져가도 판서 화면이 저절로 사라지면 안 된다 —
+        // 아직 안 그렸어도 되찾는다. 나가기는 Esc / X 로만 한다.
+        Dispatcher.BeginInvoke(() =>
+        {
+            if (_closing) return;
+            NativeMethods.SetForegroundWindow(new WindowInteropHelper(this).Handle);
+            Activate();
+        }, System.Windows.Threading.DispatcherPriority.Background);
     }
 }

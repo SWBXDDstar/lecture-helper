@@ -40,6 +40,12 @@ public sealed class DrawingSession
         if (Current is not null) Current.Color = color;
     }
 
+    /// <summary>True when the wheel is changing a pen width (not effect strength or font size).</summary>
+    public bool WheelIsThickness => Current is not EffectAnnotation && !IsEffectTool && !IsTextMode;
+
+    /// <summary>Width of the mark the pen leaves; the highlighter is drawn three times as wide.</summary>
+    public double BrushDiameter => Tool == ToolKind.Highlighter ? Thickness * 3 : Thickness;
+
     /// <summary>The wheel means thickness, effect strength or font size depending on the tool.</summary>
     public string Adjust(int steps)
     {

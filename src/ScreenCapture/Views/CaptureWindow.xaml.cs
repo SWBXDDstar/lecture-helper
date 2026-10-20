@@ -67,6 +67,8 @@ public partial class CaptureWindow : Window
     private bool _closing;
     private bool _activated;
 
+    private readonly ForegroundRestorer _foreground = new();
+
     public CaptureWindow()
     {
         InitializeComponent();
@@ -323,6 +325,12 @@ public partial class CaptureWindow : Window
 
         UpdateSizeReadout();
         UpdateCursorPreview();
+
+        // 펜류 도구는 원이 계속 떠 있다. 그 밖(도형을 그리는 중 등)엔 휠 돌린 순간만 잠깐 보인다.
+        bool thicknessWheel = _current is not EffectAnnotation && !IsEffectTool && _tool != ToolKind.Text;
+        if (thicknessWheel && !IsStrokeTool && _hasSelection && _selection.Contains(_cursor))
+            Layer.FlashSize(_cursor, _color, _thickness);
+
         Layer.InvalidateVisual();
         e.Handled = true;
     }
@@ -1197,6 +1205,8 @@ public partial class CaptureWindow : Window
     {
         base.OnClosing(e);
         _closing = true;
+        // 아직 오버레이가 화면을 덮고 있을 때 포커스를 돌려줘야, 닫히는 순간 깜빡이지 않는다.
+        _foreground.Restore();
         _hintTimer.Stop();
     }
 
@@ -1205,8 +1215,13 @@ public partial class CaptureWindow : Window
         base.OnDeactivated(e);
         if (!_activated || _closing) return;
 
-        // Something stole focus. Reclaim it rather than discard work, but bail out if nothing is at stake.
-        if (_hasSelection || Layer.Items.Count > 0) Activate();
-        else Close();
+        // 알림 풍선·다른 창이 포커스를 가져가도 캡처 화면이 저절로 사라지면 안 된다 —
+        // 영역을 고르기 전이어도 되찾는다. 나가기는 Esc / X 로만 한다.
+        Dispatcher.BeginInvoke(() =>
+        {
+            if (_closing) return;
+            NativeMethods.SetForegroundWindow(new WindowInteropHelper(this).Handle);
+            Activate();
+        }, System.Windows.Threading.DispatcherPriority.Background);
     }
 }

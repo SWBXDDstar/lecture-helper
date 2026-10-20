@@ -38,6 +38,7 @@ public partial class ZoomWindow : Window
     private bool _drawing;
     private bool _closing;
     private bool _activated;
+    private readonly ForegroundRestorer _foreground = new();
 
     public ZoomWindow()
     {
@@ -319,6 +320,8 @@ public partial class ZoomWindow : Window
             _session.Adjust(step);
             if (TextEditor.Visibility == Visibility.Visible) TextEditor.FontSize = _session.FontSize * _zoom;
             SyncHintIfVisible();
+            if (_session.WheelIsThickness)
+                Layer.FlashSize(ToContent(e.GetPosition(Viewport)), _session.Color, _session.BrushDiameter);
             Layer.InvalidateVisual();
         }
         else
@@ -457,6 +460,8 @@ public partial class ZoomWindow : Window
     {
         base.OnClosing(e);
         _closing = true;
+        // 아직 오버레이가 화면을 덮고 있을 때 포커스를 돌려줘야, 닫히는 순간 깜빡이지 않는다.
+        _foreground.Restore();
         _hintTimer.Stop();
     }
 
@@ -465,7 +470,12 @@ public partial class ZoomWindow : Window
         base.OnDeactivated(e);
         if (!_activated || _closing) return;
 
-        if (Layer.Items.Count > 0) Activate();
-        else Close();
+        // 포커스를 뺏겨도 확대 화면이 저절로 닫히면 안 된다. 나가기는 Esc / X 로만 한다.
+        Dispatcher.BeginInvoke(() =>
+        {
+            if (_closing) return;
+            NativeMethods.SetForegroundWindow(new WindowInteropHelper(this).Handle);
+            Activate();
+        }, System.Windows.Threading.DispatcherPriority.Background);
     }
 }
