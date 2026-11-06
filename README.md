@@ -15,6 +15,9 @@
 1. [.NET 8 데스크톱 런타임](https://dotnet.microsoft.com/download/dotnet/8.0/runtime) 설치 (없을 때만)
 2. `dist\ScreenNote.exe`, `dist\ScreenCapture.exe` 를 받아서 원하는 폴더에 두고 실행
 
+**남에게 나눠줄 때는 포터블본**(`dist-portable\LectureHelper_Portable.zip`, 115 MB)을 주세요.
+.NET 런타임이 exe 안에 들어 있어 아무것도 설치할 필요가 없습니다. 만드는 법은 아래 「빌드」에 있습니다.
+
 각각 트레이에 상주합니다. 둘 다 켜둬도 단축키가 안 겹칩니다. 수업 때는 ScreenNote만 켜두면 됩니다.
 
 | | ScreenNote | ScreenCapture |
@@ -245,7 +248,7 @@ Windows 64비트 전용입니다.
 ## 소스 구조
 
 ```
-lecture helper/
+LectureHelper/
   LectureHelper.sln
   dist/                        배포용 exe 두 개
   src/
@@ -283,5 +286,13 @@ dotnet build LectureHelper.sln
 ```bash
 dotnet publish src/ScreenNote/ScreenNote.csproj -c Release -r win-x64 --self-contained false -p:PublishSingleFile=true -p:DebugType=none -o dist
 ```
+
+포터블본 (런타임 포함, exe 하나당 약 63 MB — 두 앱 다 돌린 뒤 `읽어주세요.txt` 와 함께 zip):
+
+```bash
+dotnet publish src/ScreenNote/ScreenNote.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true -p:DebugType=none -o dist-portable/LectureHelper_Portable
+```
+
+`dist-portable/` 은 GitHub 100 MB 제한 때문에 `.gitignore` 에 넣었습니다. 깃허브로 나눌 때는 Releases에 zip을 올리세요.
 
 오류는 `%TEMP%\ScreenNote.log` / `%TEMP%\ScreenCapture.log` 에 남습니다.
